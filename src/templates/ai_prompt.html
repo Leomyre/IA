@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ask the AI</h1>
+    <form id="ai-form">
+        <label for="prompt">Enter your prompt:</label><br>
+        <textarea id="prompt" name="prompt" rows="4" cols="50" required></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="response">
+        <strong>Response:</strong>
+        <p id="ai-response"></p>
+    </div>
+
+    <script>
+        document.getElementById("ai-form").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Empêche le rechargement de la page
+
+            const prompt = document.getElementById("prompt").value;
+
+            try {
+                const response = await fetch("", { // Vue Django actuelle
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                    body: new URLSearchParams({ prompt }),
+                });
+
+                const data = await response.json();
+                if (data.response) {
+                    document.getElementById("ai-response").innerText = data.response;
+                } else if (data.error) {
+                    document.getElementById("ai-response").innerText = "Error: " + data.details;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("ai-response").innerText = "An error occurred while contacting the API.";
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
